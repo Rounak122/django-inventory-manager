@@ -1,0 +1,14 @@
+*.pyc  
+*~  
+__pycache__/
+.db
+.sqlite3  
+/static
+/media
+/static_cdn
+/media_cdn
+.*
+
+# Accept these
+
+!.gitignore

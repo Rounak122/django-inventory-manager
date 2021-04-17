@@ -1,20 +1,19 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-# from rest_framework.permissions import IsAuthenticated
-# from rest_framework.authentication import TokenAuthentication
-# from rest_framework.pagination import PageNumberPagination
-# from rest_framework.generics import ListAPIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.generics import ListAPIView
 # from rest_framework.filters import SearchFilter, OrderingFilter
 
 from accounts.models import Account
 from products.models import Product
 from products.api.serializer import ProductSerializer
-# from blog.models import BlogPost
-# from blog.api.serializers import BlogPostSerializer, BlogPostUpdateSerializer, BlogPostCreateSerializer
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_product(request):
 
     try:
@@ -23,6 +22,9 @@ def get_product(request):
                 key = request.GET.get('key')
                 try:
                     product = Product.objects.get(pk=key)
+                    user = request.user
+                    if user != product.owner:
+                        return Response({"message": "permission not granted"}, status=status.HTTP_403_FORBIDDEN)
 
                 except Product.DoesNotExist:
                     return Response(status=status.HTTP_404_NOT_FOUND)
@@ -30,7 +32,8 @@ def get_product(request):
                 serializer = ProductSerializer(product)
                 return Response(serializer.data)
             else:
-                product = Product.objects.all()
+                user = request.user
+                product = Product.objects.filter(owner=user)
                 serializer = ProductSerializer(product, many=True)
                 return Response(serializer.data)
 
@@ -39,6 +42,7 @@ def get_product(request):
 
 
 @api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
 def update_product(request):
 
     try:
@@ -46,6 +50,9 @@ def update_product(request):
             key = request.GET.get('key')
             try:
                 product = Product.objects.get(pk=key)
+                user = request.user
+                if user != product.owner:
+                    return Response({"message": "permission not granted"}, status=status.HTTP_403_FORBIDDEN)
 
             except Product.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
@@ -61,9 +68,10 @@ def update_product(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def create_product(request):
 
-    owner = Account.objects.get(pk=1)
+    owner = request.user
     new_product = Product(owner=owner)
 
     try:
@@ -80,6 +88,7 @@ def create_product(request):
 
 
 @api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def delete_product(request):
 
     try:
@@ -87,6 +96,9 @@ def delete_product(request):
             key = request.GET.get('key')
             try:
                 product = Product.objects.get(pk=key)
+                user = request.user
+                if user != product.owner:
+                    return Response({"message": "permission not granted"}, status=status.HTTP_403_FORBIDDEN)
 
             except Product.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
@@ -100,3 +112,25 @@ def delete_product(request):
 
     except ValueError:
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class ListProducts(ListAPIView):
+
+    serializer_class = ProductSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination
+    # filter_backends = [SearchFilter, OrderingFilter]
+    # search_fields = ['name', 'code']
+
+    def get(self, request):
+        user = request.user
+        queryset = Product.objects.filter(owner=user)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = ProductSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = ProductSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

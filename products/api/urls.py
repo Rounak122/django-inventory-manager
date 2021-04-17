@@ -7,4 +7,5 @@ urlpatterns = [
     path('update_product', update_product),
     path('create_product', create_product),
     path('delete_product', delete_product),
+    path('list_product', ListProducts.as_view()),
 ]

@@ -3,14 +3,14 @@
 
 ## 1. Get by Key
 
->http://127.0.0.1:8000/api/products/get_product_by_key?key=2
+    api/products/get_product?key=2
 
 Type: Get
 
 
 ## 2. GET ALL OF OWNER (ALL TILL NOW)
 
->http://127.0.0.1:8000/api/products/get_product_by_key
+>http://127.0.0.1:8000/api/products/get_product
 
 Type: Get
 
@@ -50,3 +50,37 @@ Type: Put
 >http://127.0.0.1:8000/api/products/delete_product?key=1
 
 Type: Delete
+
+## 6. Create User
+
+>http://127.0.0.1:8000/api/accounts/create_user
+
+Type: post
+
+This will return a JWT 
+
+```
+{
+
+    "email": "password@gmail.com",
+    "username":"pass122",
+    "password":"password",
+    "mobile_number": "56563",
+    "first_name": "pass",
+    "last_name": "word"
+
+}
+```
+
+## 7. Login User
+
+>http://127.0.0.1:8000/api/accounts/login_user
+
+Type: post
+
+```
+{
+    "username": "tokens1@gmail.com",
+    "password":"password"
+}
+```

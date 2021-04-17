@@ -74,13 +74,34 @@ This will return a JWT
 
 ## 7. Login User
 
->http://127.0.0.1:8000/api/accounts/login_user
+    api/accounts/login_user
 
 Type: post
+(Form Data)
 
 ```
 {
     "username": "tokens1@gmail.com",
     "password":"password"
+}
+```
+
+## 8. Check if User Exists
+
+    api/accounts/check_user_exists?email=ussddscer@gmasdil.com
+
+Type: Get
+
+## 9. Change password
+
+    api/accounts/change_user_password
+
+Type: post
+Token Reqd.
+
+```
+{
+    "old_password":"userdsuseruser",
+    "new_password":"passpasspass"
 }
 ```

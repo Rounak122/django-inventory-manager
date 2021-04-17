@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 from pathlib import Path
+import os
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -44,6 +45,13 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'accounts.Account'
+
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.AllowAllUsersModelBackend',
+    'accounts.backends.CaseInsensitiveModelBackend',
+)
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -91,16 +99,13 @@ WSGI_APPLICATION = 'django_inventory_manager.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DB_NAME = 'qr_inventory'
-DB_USER = 'rounak_qr'
-DB_USER_PASSWORD = 'incorrectt@123'
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': DB_NAME,
-        'USER': DB_USER,
-        'PASSWORD': DB_USER_PASSWORD,
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_USER_PASSWORD'),
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -154,8 +159,17 @@ STATICFILES_DIRS = [
 # WHILE IN PRODUCTION
 STATIC_ROOT = BASE_DIR / "static_cdn"
 MEDIA_ROOT = BASE_DIR / "media_cdn"
-
+TEMP = BASE_DIR / "temp"
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# EMAIL
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')

@@ -28,11 +28,17 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         model = Account
         # Tuple of serialized model fields
         fields = ("id", "username", "email", "password", "first_name",
-                  "last_name", "mobile_number", )
+                  "last_name", "mobile_number", "is_paid")
 
 
 class UserDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ("username", "email")
+        fields = ("username", "email", "is_paid")
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)

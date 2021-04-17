@@ -74,9 +74,10 @@ class Account(AbstractBaseUser):
     date_joined = models.DateTimeField(
         verbose_name="Date Joined", auto_now_add=True)
     is_admin = models.BooleanField(default="False")
-    is_active = models.BooleanField(default="True")
+    is_active = models.BooleanField(default="False")
     is_staff = models.BooleanField(default="False")
     is_superuser = models.BooleanField(default="False")
+    is_paid = models.BooleanField(default="False")
     profile_image = models.ImageField(max_length=255, upload_to=get_profile_image_filepath,
                                       null=True, blank=True, default=get_default_profile_image_filepath)
 

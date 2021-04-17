@@ -56,12 +56,21 @@ def update_product(request):
 
             except Product.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
-
+            data = {}
             serializer = ProductSerializer(product, request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                data["error"] = False
+                image_url = str(request.build_absolute_uri(product.image.url))
+                if "?" in image_url:
+                    image_url = image_url[:image_url.rfind("?")]
+                data['image'] = image_url
+                data['product'] = serializer.data
+                return Response(data, status=status.HTTP_201_CREATED)
+            else:
+                data["error"] = True
+                data["response"] = serializer.errors
+                return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
     except ValueError:
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -73,18 +82,26 @@ def create_product(request):
 
     owner = request.user
     new_product = Product(owner=owner)
-
+    data = {}
     try:
         if request.method == 'POST':
 
             serializer = ProductSerializer(new_product, request.data)
+
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                data['error'] = False
+                data['response'] = serializer.data
+                return Response(data, status=status.HTTP_201_CREATED)
+            else:
+                data['error'] = True
+                data['response'] = serializer.errors
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
     except ValueError:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        data['error'] = True
+        return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['DELETE'])

@@ -1,0 +1,22 @@
+version: '3.7'
+
+# FOR LOCAL DEVELOPMENT
+services:
+    app:
+        build: .  #context of the build is the local directory
+        ports:
+            - "8000:8000"   #port 8000 of our local machine is maapped to port 8000 of docker container
+        volumes:
+            - ./src:/src  #maps our src directory to src dir of django container
+        command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"    #using django's websever during development
+        env_file:
+            - ./src/.env_dev
+        depends_on: 
+            - db
+    db:
+        image: postgres:10-alpine
+        ports:
+            - "5432:5432"
+        env_file: 
+            - ./src/.env_dev
+        

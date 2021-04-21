@@ -1,0 +1,33 @@
+  
+version: '3.7'
+
+services:
+    app:
+        build: .
+        volumes:
+            - static_data:/vol/web
+        env_file: 
+            ./src/.env_prod
+        depends_on: 
+            - db
+
+    proxy:
+        build:
+            context: ./nginx
+        volumes:
+            - static_data:/vol/static
+        ports:
+            - "8080:8080"
+        depends_on:
+            - app
+
+    db:
+        image: postgres:10-alpine
+        ports:
+            - "5432:5432"
+        env_file: 
+            - ./src/.env_prod
+
+
+volumes:
+  static_data:
